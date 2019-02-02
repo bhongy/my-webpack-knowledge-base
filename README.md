@@ -36,3 +36,30 @@ Based on Webpack 4.
 
 - **chunk** (vs module vs emitted assets)
 - **entry chunk** ...
+
+
+## Webpack Philosophy
+
+- build dependency graph(s) of dependent modules
+  - at the very high-level, webpack just build dependency graph of modules and doesn't care what type of file that module is (just delegate to loaders)
+- everything is a module i.e. a javascript file can "import" css files or image files
+
+
+## Brain dump
+
+- always use absolute path for entry/output - be explicit and use node's `path` module to resolve the absolute path for everything (well except `output.publicPath`)
+- `stats.toJson()` is a great way to work with stats to build html response instead of working directly on the `stats` instance. The json stats looks like [this](https://webpack.js.org/api/stats/#structure).
+- loaders (modules) vs plugins (chunks)
+
+
+## Webpack 3 <> 4 Interopt for Plugins
+
+```javascript
+if (compiler.hooks) {
+  // Webpack 4
+  compiler.hooks.done.tap('PluginName', handler);
+} else {
+  // Webpack 3
+  compiler.plugin('done', handler);
+}
+```
