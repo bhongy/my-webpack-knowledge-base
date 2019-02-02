@@ -1,7 +1,76 @@
 /**
  * This is not complete/correct. My personal exploration of webpack data.
  */
+
+// based on Webpack 4.29.0 <25bccd4c4>
+
+import * as Tapable from 'tapable';
+
 declare namespace webpack {
+  interface Configuration {
+    cache: boolean;
+    context: string;
+    devtool: string;
+    entry: string;
+    mode: 'developement' | 'production' | 'none';
+    module: {
+      defaultRules: Array<Configuration.Rule>;
+      rules: Array<Configuration.Rule>;
+    };
+    node: {
+      __dirname: boolean | 'mock';
+      __filename: boolean | 'mock';
+      Buffer: boolean | 'mock';
+      console: boolean | 'mock';
+      global: boolean | 'mock';
+      process: boolean | 'mock';
+      setImmediate: boolean | 'mock';
+    };
+    // ...
+  }
+
+  namespace Configuration {
+    interface Rule {}
+  }
+
+  interface MultiCompiler {
+    compilers: Array<Compiler>;
+    hooks: { // MultiCompilerHooks?
+      // hooks.done.tap('name', handler)
+      // MultiCompiler.hooks.done is SyncHook not AsyncSeriesHook
+      done: Tapable.SyncHook<MultiStats>;
+      // invalid: Tapable.MultiHook;
+      // run: Tapable.MultiHook;
+      // watchClose: Tapable.SyncHook;
+      // watchRun: Tapable.MultiHook;
+    };
+    // both input & output file system:
+    //   get -> throws an error
+    //   set -> set the input (or output) file system for "all" compilers
+    inputFileSystem: never; // throws an error
+    outputFileSystem: never; // throws an error
+    // common `output.path` across all compilers
+    // e.g. <root>/dist/client/ and <root>/dist/server/ -> <root>/dist/
+    outputPath: string;
+    // watch(WatchOptions, Handler)
+    // run(DoneCallback)
+    // running: boolean; (private)
+  }
+
+  interface Compiler {
+    context: string; // absolute path
+    hooks: {
+      done: Tapable.AsyncSeriesHook<Stats>;
+    };
+    // inputFileSystem: IFileSystem;
+    name: undefined | string;
+    options: Configuration;
+    // outputFileSystem: IFileSystem;
+    outputPath: string;
+    // watchFileSystem
+    watchMode: boolean;
+  }
+
   interface MultiStats {
     stats: Array<webpack.Stats>;
     hash: string;
@@ -35,29 +104,9 @@ declare namespace webpack {
     fullHash: string;
     hash: string;
     hooks: {};
-    inputFileSystem: InputFileSystem;
+    // inputFileSystem: InputFileSystem;
     name: undefined | string;
-    options: {
-      cache: boolean;
-      context: string;
-      devtool: string;
-      entry: string;
-      mode: 'developement' | 'production' | 'none';
-      module: {
-        defaultRules: Array<Config.Rule>;
-        rules: Array<Config.Rule>;
-      };
-      node: {
-        __dirname: boolean | 'mock';
-        __filename: boolean | 'mock';
-        Buffer: boolean | 'mock';
-        console: boolean | 'mock';
-        global: boolean | 'mock';
-        process: boolean | 'mock';
-        setImmediate: boolean | 'mock';
-      };
-      // ...
-    };
+    options: Configuration;
     outputOptions: {
       chunkFilename: string;
       crossOriginLoading: boolean;
