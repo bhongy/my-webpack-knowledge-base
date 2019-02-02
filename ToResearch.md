@@ -14,6 +14,8 @@ Topics I'm researching to build scalable, server-side render web servers.
   - how webpackHotServerMiddleware does it
   - the key is to update handler function when compilation hook "done" is fired
 - [X] How to get information about static assets to server render
+  - for initial assets: the information is available in clientStats use in server render handler
+  - for on-demand assets: nothing to do. the information is automatically handle via webpack runtime on the client-side
 - [ ] How to compile only related subtree of the requesting page/entry
 
 ### Production Workflow
