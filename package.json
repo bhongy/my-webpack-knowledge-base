@@ -1,0 +1,11 @@
+{
+  "name": "my-webpack-knowledge-base",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:bhongy/my-webpack-knowledge-base.git",
+  "author": "Thanik Bhongbhibhat <email@thanik.me>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/tapable": "^1.0.4"
+  }
+}
