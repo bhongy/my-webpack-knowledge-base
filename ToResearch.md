@@ -4,6 +4,7 @@ Topics I'm researching to build scalable, server-side render web servers.
 ### Development Workflow
 
 - [X] Multicompiler 1 client, 1 server (ssr react)
+  - client & server share webpack cache
 - [X] The distinction/boundary between server (render) bundle and dev server ("import" server bundle)
 - [ ] Hooking up webpack (watch) to a running dev server
 - [ ] Dev Server respond only after the first compilation finishes
@@ -24,3 +25,12 @@ brain dump a.k.a. wip:
 - build client & build server into bundles
 - web server (production) just "import" server (render) bundle
   - client asset manifest (stats)? - assetsByChunkName
+
+### Verify these issues are solved
+
+- [chunkhash/contenthash can vary between builds](https://github.com/webpack/webpack/issues/7179)
+  - tool to compare files whose chunkhashes change between two builds?
+  - **very important** to verify
+- [using runtime chunks force entry chunks to use chunkFilename rather than filename](https://github.com/webpack/webpack/issues/6598)
+  - [will be fixed in webpack 5](https://github.com/webpack/webpack/pull/7401#issuecomment-392757853)
+  - it might still be workable for me without this is fix
