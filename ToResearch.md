@@ -7,6 +7,8 @@ Topics I'm researching to build scalable, server-side render web servers.
   - client & server share webpack cache
 - [X] The distinction/boundary between server (render) bundle and dev server ("import" server bundle)
 - [ ] Hooking up webpack (watch) to a running dev server
+  - how webpackDevMiddleware does it
+  - pass compiler instance to create middleware and just listen to the compiler hooks
 - [ ] Dev Server respond only after the first compilation finishes
   - must finish both client & server
 - [ ] Dev Server holds the response if there's running recompilation
@@ -18,6 +20,7 @@ Topics I'm researching to build scalable, server-side render web servers.
   - for initial assets: the information is available in clientStats use in server render handler
   - for on-demand assets: nothing to do. the information is automatically handle via webpack runtime on the client-side
 - [ ] How to compile only related subtree of the requesting page/entry
+- [ ] VSCode debugging attach to the bundled server runtime (server/render not server/index)
 
 ### Production Workflow
 
@@ -34,3 +37,20 @@ brain dump a.k.a. wip:
 - [using runtime chunks force entry chunks to use chunkFilename rather than filename](https://github.com/webpack/webpack/issues/6598)
   - [will be fixed in webpack 5](https://github.com/webpack/webpack/pull/7401#issuecomment-392757853)
   - it might still be workable for me without this is fix
+
+## Ideas: how to "defer" response during active compilation
+
+### Option 1
+- always register to the Done observable
+- when "done" is fire, synchronously execute all registered callbacks (drain)
+- if it's already done, execute the callback nextTick (like promise that resolve immediately)
+
+### Option 2
+- have an object that we keep swapping out the "done" promise
+- just always `.then` to the done promise - let the promise takes care of the rest
+- harder because how we must handle "compiling" state
+
+### Option 3
+- do like webpack-dev-middleware just set flag and keep mutate the object containing that flag
+- then keep an array of callbacks if the flag is false
+- or execute the function right away if the flag is true

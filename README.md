@@ -45,6 +45,17 @@ Based on Webpack 4.
 - everything is a module i.e. a javascript file can "import" css files or image files
 
 
+## What is in webpack-dev-middleware
+WebpackDevMiddleware is used internally in WebpackDevServer, (Next.js)[https://github.com/zeit/next.js/blob/98cf0a83116270150fabee595264dd7a848f3304/packages/next/package.json#L87] and 
+
+- webpack compilation uses in-memory file system (can write to disk)
+- middleware that serves webpack-bundled assets
+- defer action (e.g. binds server to port) until the compilation is ready
+- lazy compilation (rebuild only when receiving request)
+  - default is watch mode (rebuild on file changes)
+- supports for hot module replacement (HMR)
+
+
 ## Brain dump
 
 - always use absolute path for entry/output - be explicit and use node's `path` module to resolve the absolute path for everything (well except `output.publicPath`)
@@ -63,3 +74,20 @@ if (compiler.hooks) {
   compiler.plugin('done', handler);
 }
 ```
+
+compiler hooks
+
+Compile
+
+-> `normalModuleFactory`
+-> `contextModuleFactory`
+>>
+-> `beforeCompile`
+-> `compile`
+-> { newCompilation(params) }
+-> `thisCompilation`
+-> `compilation`
+-> `make`
+-> { compilation.finish() }
+-> { compilation.seal() }
+-> `afterCompile`

@@ -4,7 +4,7 @@
 
 // based on Webpack 4.29.0 <25bccd4c4>
 
-import * as Tapable from 'tapable';
+import * as Tapable from "tapable";
 
 declare namespace webpack {
   interface Configuration {
@@ -12,19 +12,19 @@ declare namespace webpack {
     context: string;
     devtool: string;
     entry: string;
-    mode: 'developement' | 'production' | 'none';
+    mode: "developement" | "production" | "none";
     module: {
       defaultRules: Array<Configuration.Rule>;
       rules: Array<Configuration.Rule>;
     };
     node: {
-      __dirname: boolean | 'mock';
-      __filename: boolean | 'mock';
-      Buffer: boolean | 'mock';
-      console: boolean | 'mock';
-      global: boolean | 'mock';
-      process: boolean | 'mock';
-      setImmediate: boolean | 'mock';
+      __dirname: boolean | "mock";
+      __filename: boolean | "mock";
+      Buffer: boolean | "mock";
+      console: boolean | "mock";
+      global: boolean | "mock";
+      process: boolean | "mock";
+      setImmediate: boolean | "mock";
     };
     // ...
   }
@@ -35,7 +35,8 @@ declare namespace webpack {
 
   interface MultiCompiler {
     compilers: Array<Compiler>;
-    hooks: { // MultiCompilerHooks?
+    hooks: {
+      // MultiCompilerHooks?
       // hooks.done.tap('name', handler)
       // MultiCompiler.hooks.done is SyncHook not AsyncSeriesHook
       done: Tapable.SyncHook<MultiStats>;
@@ -89,10 +90,20 @@ declare namespace webpack {
     assets: {
       // such as 'js/main-da900a1a04ae7b32a54f.js'
       [outputFilename: string]: {
+        // ** the object is actually CachedSource from webpack-source
         emitted: boolean;
         // output location (absolute path)
         // e.g. '/Users/me/project/dist/client/js/main-da900a1a04ae7b32a54f.js'
         existedAt: string;
+        size(): number;
+        source(): string | Array<string>; // not sure
+        // sourceAndMap: Function;
+        // _cachedMaps: {};
+        // _cacheSize: number;
+        // _cachedSource: string; // string of source content
+        // _source
+        // listMap(options)
+        // node(options)
       };
     };
     bail: undefined | unknown;
@@ -160,7 +171,7 @@ declare namespace webpack {
       // the chunk names that this asset contains
       chunkNames: Array<string> /* e.g. ['locale0'] */;
       // the chunk IDs that this asset contains
-      chunks: Array<JsonStats.Chunk['id']> /* e.g. ['locale0'] or [32] */;
+      chunks: Array<JsonStats.Chunk["id"]> /* e.g. ['locale0'] or [32] */;
       // whether asset made it to the output directory
       emitted: boolean;
       name: string /* e.g. 'locale0-d282404aea4a08425082.js' */;
@@ -171,12 +182,12 @@ declare namespace webpack {
       // whether the chunk contains webpack runtime
       entry: boolean;
       // array of filenames that has this chunk
-      files: Array<string>; /* e.g. ['locale0-d282404aea4a08425082.js'] */
+      files: Array<string> /* e.g. ['locale0-d282404aea4a08425082.js'] */;
       // same as ToJsonStats.filteredModules
       filteredModules: number;
       // I believe this is chunkhash (not the compilation hash)
       hash: string;
-      id: string | number; /* e.g. 'locale0' or 32 */
+      id: string | number /* e.g. 'locale0' or 32 */;
       // whether this is an entry chunk (or on-demand)
       initial: boolean;
       modules: Array<JsonStats.Module>;
@@ -184,7 +195,9 @@ declare namespace webpack {
       names: Array<string>;
       origins: Array<JsonStats.ChunkOrigin>;
       // parent chunk ids
-      parents: Array<string | number>; /* e.g. ['main', 'runtime~main', 'vendors~main'] */
+      parents: Array<
+        string | number
+      > /* e.g. ['main', 'runtime~main', 'vendors~main'] */;
       // whether the chunk went through code generation
       rendered: boolean;
       size: number;
@@ -216,13 +229,13 @@ declare namespace webpack {
       built: boolean;
       cacheable: boolean;
       // ids of chunks that contain this module
-      chunks: Array<JsonStats.Chunk['id']>;
+      chunks: Array<JsonStats.Chunk["id"]>;
       // num errors when resolving or processing this module
       errors: number;
       // whether the compilation is failed on this module
       failed: boolean;
-      id: string; /* e.g. './src/locale/en-US.json' */
-      identifier: string; /* e.g. '/Users/username/path-to-project/src/locale/en-US.json' */
+      id: string /* e.g. './src/locale/en-US.json' */;
+      identifier: string /* e.g. '/Users/username/path-to-project/src/locale/en-US.json' */;
       name: string;
       optional: boolean; // ?
       prefetch: boolean;
