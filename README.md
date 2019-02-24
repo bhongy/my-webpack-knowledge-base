@@ -23,19 +23,27 @@ Based on Webpack 4.
 - `[hash]` is the hash of the entire compilation—all assets will use the same hash
 - `[chunkhash]` is the hash of the content of the entry's chunk
 - `[contenthash]` is the hash of only the content (e.g. extracted css content)
+- `externals` is a way to "exclude" modules/node_modules from the output bundle
+  - the bundle will rely on those modules from the runtime environment
+  - no external means anything that is imported will be part of the output bundle
 - `optimization.splitChunks.chunks` tells the type of chunk splitting to use
   - accepts 3 values `"async" | "initial" | "all"`
   - the __default__ is `"async"` meaning all code-splitting (via `import()`) will be splitted and extract into a separate bundle hence if you do not use `"all"` you don't see the common modules like React extracted into a separate chunk.
-  - `"all"` will on-demand (async) chunks (like `"async"`) as well as sync chunks (e.g. `import React from 'react'`). It is not enabled by default because your html generation needs a way to include the dynamic initial assets (number of assets and their names).
-  - I still don't really understand `"initial"`
+  - `"all"` will split on-demand (async) chunks (like `"async"`) as well as sync chunks (e.g. `import React from 'react'`). It is not enabled by default because your html generation needs a way to include the dynamic initial assets (number of assets and their names).
+  - `"initial"` will split only initial (dub: entry, sync) chunks
   - example of the 3 `chunks` modes [Webpack 4 — Mysterious SplitChunks Plugin @ Hemal Patel](https://medium.com/dailyjs/webpack-4-splitchunks-plugin-d9fbbe091fd0)
   - how SplitChunksPlugin works -> [RIP CommonsChunkPlugin @ Sokra](https://gist.github.com/sokra/1522d586b8e5c0f5072d7565c2bee693) | [webpack 4: Code Splitting, chunk graph and the splitChunks optimization @ Sokra](https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366)
+- `runtimeChunk`:
+  - `'single'` or `true` will generates a single runtime chunk that contains all module mappings that is used across all entry chunks
+  - `'multiple'` is more optimized an will generate one runtime chunk for each entry which contains only the mapping of the modules that is part of that entry
 
 
 ## Terminology
 
 - **chunk** (vs module vs emitted assets)
 - **entry chunk** ...
+- ?? what's the difference between "emit" and "done"
+- ?? output -> libraryTarget: 'jsonp'
 
 
 ## Webpack Philosophy

@@ -17,6 +17,7 @@ declare namespace webpack {
       defaultRules: Array<Configuration.Rule>;
       rules: Array<Configuration.Rule>;
     };
+    externals: Configuration.Externals | Array<Configuration.Externals>;
     node: {
       __dirname: boolean | "mock";
       __filename: boolean | "mock";
@@ -31,6 +32,16 @@ declare namespace webpack {
 
   namespace Configuration {
     interface Rule {}
+
+    type Externals = string | RegExp | ExternalsObject | ExternalsFunction;
+
+    interface ExternalsObject {
+      [key: string]: boolean | string | Array<string> | ExternalsObject;
+    }
+
+    interface ExternalsFunction {
+      // (context, request, callback): void;
+    }
   }
 
   interface MultiCompiler {
