@@ -31,7 +31,16 @@ declare namespace webpack {
   }
 
   namespace Configuration {
-    interface Rule {}
+    interface Rule {
+      // shortcut for resource.test
+      test?: RegExp | string | ((path: string) => boolean);
+      use?:  RuleUse | RuleUse[];
+    }
+
+    interface RuleUse {
+      loader?: string;
+      options?: string | { [k: string]: string };
+    }
 
     type Externals = string | RegExp | ExternalsObject | ExternalsFunction;
 
@@ -142,9 +151,9 @@ declare namespace webpack {
     performance: boolean;
     profile: undefined | unknown;
     warnings: Array<unknown>;
-  }
-
-  interface Entrypoint {}
+    //
+    getStats(): webpack.Stats;
+  }  
 
   interface ToJsonStats {
     _showErrors: boolean;
@@ -274,6 +283,48 @@ declare namespace webpack {
   }
 
   interface Module {}
+  interface NormalModule extends Module {
+    loaders: Loader[];
+    parser: Parser;
+    build(/* ... */): unknown;
+  }
+
+  interface Chunk {
+    id: string; // e.g. 'about'
+    name: string; // e.g. 'about'
+    debugId: number; // e.g. 1001
+    rendered: boolean;
+    contentHash: unknown; // { javascript: 'e02d79a2951c6d984828' }
+    hash: undefined | string;
+    renderedHash: undefined | string; // seems to be len20 truncated version of hash
+
+    entryModule: Module; // always NormalModule?
+    files: string[]; // e.g. ['about-e02d79a2951c6d984828.js']
+    filenameTemplate: undefined | string;
+
+    // groupsIterable: Set<ChunkGroup>;
+    // modulesIterable: Set<>;
+
+    // DEPRECATED
+    // blocks -> getBlocks()
+    // chunks -> getChildren()
+    // entry -> hasRuntime()
+    // entrypoints -> Use Chunks.groupsIterable and filter by instanceof Entrypoint instead
+    // initial
+    // parents -> ChunkGroup.getParents()
+  }
+
+  interface ChunkGroup {}
+  interface ChunkHash {}
+  interface Dependency {}
+  interface Entrypoint {}
+
+  interface Loader {
+    ident: string; // e.g. ref--4
+    loader: string // absolute path
+    options: unknown;
+  }
+  interface Parser {}
 
   /*
   interface SplitChunksOptions {

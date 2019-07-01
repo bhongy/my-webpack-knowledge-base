@@ -40,7 +40,11 @@ Based on Webpack 4.
 
 ## Terminology
 
-- **chunk** (vs module vs emitted assets)
+Work in progress. These could be incorrect.
+
+- **chunk** consider it as build output.
+- **module** consider it as build input.
+- (vs emitted assets)
 - **entry chunk** ...
 - ?? what's the difference between "emit" and "done"
 - ?? output -> libraryTarget: 'jsonp'
@@ -71,6 +75,11 @@ WebpackDevMiddleware is used internally in WebpackDevServer, (Next.js)[https://g
 - loaders (modules) vs plugins (chunks)
 
 
+## Open Questions
+
+- why does webpack compilation for node bundle all chunks into one big file rather than keep them separate and use require? Even with `target: 'node'`
+
+
 ## Webpack 3 <> 4 Interopt for Plugins
 
 ```javascript
@@ -87,15 +96,135 @@ compiler hooks
 
 Compile
 
+>>
+-> { newCompilationParams() }
 -> `normalModuleFactory`
 -> `contextModuleFactory`
->>
 -> `beforeCompile`
 -> `compile`
 -> { newCompilation(params) }
 -> `thisCompilation`
--> `compilation`
--> `make`
+-> `compilation` :: after Compilation instance is created
+-> `make` :: new compilation starts (lots of plugins that kicks off the work here)
+   { compilation.addEntry(context, entry, name) }
+    -> `addEntry`
+    -> { compilation._addModuleChain }
+      <!-- resolve + create Module (unbuilt, unknown deps) -->
+      -> { NormalModuleFactory.create }
+        -> `beforeResolve`
+        -> `factory` { NormalModuleFactory.hooks.factory.tap }
+        -> `resolver` { NormalModuleFactory.hooks.resolver.tap}
+        -> `afterResolve`
+        -> `createModule`
+        -> `module`
+      -> { compilation.addModule }
+      <!-- load + parse Module (has list of deps) -->
+      -> { compilation.buildModule }
+        -> `buildModule`
+          -> { module.build }
+            -> { module.doBuild }
+              -> { module.createLoaderContext }
+              -> `normalModuleLoader`
+              -> { loader-runner#runLoaders }
+                -> { iteratePitchingLoaders -> processResource -> loaderContext.addDependency }
+            -> { module.parser.parse }
+        -> `failedModule` | `succeedModule`
+        -> (`rebuildModule` is not been called anymore?)
+      -> { compilation.processModuleDependencies }
+        -> { compilation.addModuleDependencies }
+          <!-- repeat steps similar to compilation._addModuleChain -->
+          -> { compilation.addModule }
+          -> { compilation.buildModule }
+          ...
+    -> `failedEntry` | `successEntry`
 -> { compilation.finish() }
+    -> `finishModules`
 -> { compilation.seal() }
+    -> `seal` :: the compilation stops accepting new modules
+    -> `optimizeDependenciesBasic`
+    -> `optimizeDependencies`
+    -> `optimizeDependenciesAdvanced`
+    -> `afterOptimizeDependencies`
+    <!-- chunks -->
+    -> `beforeChunks`
+      -> { compilation.processDependenciesBlocksForChunkGroups -> .getDependencyReference }
+      -> `dependencyReference`
+    -> `afterChunks`
+    -> `optimize`
+    -> `optimizeModulesBasic`
+    -> `optimizeModules`
+    -> `optimizeModulesAdvanced`
+    -> `afterOptimizeModules`
+    -> `optimizeChunksBasic`
+    -> `optimizeChunks`
+    -> `optimizeChunksAdvanced`
+    -> `afterOptimizeChunks`
+    -> `optimizeTree`
+    -> `afterOptimizeTree`
+    -> `optimizeChunkModulesBasic`
+    -> `optimizeChunkModules`
+    -> `optimizeChunkModulesAdvanced`
+    -> `afterOptimizeChunkModules`
+    -> `shouldRecord`
+    -> `reviveModules`
+    -> `optimizeModuleOrder`
+    -> `advancedOptimizeModuleOrder`
+    -> `beforeModuleIds`
+    -> `moduleIds`
+    -> `optimizeModuleIds`
+    -> `afterOptimizeModuleIds`
+    -> `reviveChunks`
+    -> `optimizeChunkOrder`
+    -> `beforeChunkIds`
+    -> `optimizeChunkIds`
+    -> `recordModules`
+    -> `recordChunks`
+    <!-- hash -->
+    -> `beforeHash`
+      -> { compilation.createHash }
+      -> `chunkHash`
+      -> `contentHash`
+    -> `afterHash`
+    -> `recordHash`
+    <!-- assets -->
+    -> `beforeModuleAssets`
+    -> { compilation.createModuleAssets }
+      -> `moduleAsset` <!-- e.g. images via file-loader -->
+    -> `shouldGenerateChunkAssets`
+    -> `beforeChunkAssets`
+    -> { compilation.createChunkAssets }
+      -> `chunkAsset`
+    -> `additionalChunkAssets`
+    -> `record`
+    -> `additionalAssets`
+    -> `optimizeChunkAssets`
+    -> `afterOptimizeChunkAssets`
+    -> `optimizeAssets`
+    -> `afterOptimizeAssets`
+    -> `needAdditionalSeal`
+    -> `afterSeal`
 -> `afterCompile`
+-> `shouldEmit`
+-> `emit` :: before emitting assets to the output dir
+-> `afterEmit`
+-> `needAdditionalPass`
+-> `done` :: the compilation is completed
+
+Watch Only
+
+-> `invalid` :: watch compilation is invalidated
+
+
+
+Important files:
+- WebpackOptionsDefaulter
+- WebpackOptionsApply
+- Compiler
+- Compilation
+- NormalModuleFactory
+- NormalModule
+- Stats
+
+Important hooks:
+- `compiler.hooks.make ( compilation )`
+- `compiler.hooks.done ( compilationStats )`
