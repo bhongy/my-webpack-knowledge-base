@@ -6,12 +6,12 @@ Topics I'm researching to build scalable, server-side render web servers.
 - [X] Multicompiler 1 client, 1 server (ssr react)
   - client & server share webpack cache
 - [X] The distinction/boundary between server (render) bundle and dev server ("import" server bundle)
-- [ ] Hooking up webpack (watch) to a running dev server
+- [X] Hooking up webpack (watch) to a running dev server
   - how webpackDevMiddleware does it
   - pass compiler instance to create middleware and just listen to the compiler hooks
-- [ ] Dev Server respond only after the first compilation finishes
+- [X] Dev Server respond only after the first compilation finishes
   - must finish both client & server
-- [ ] Dev Server holds the response if there's running recompilation
+- [X] Dev Server holds the response if there's running recompilation
   - must finish both client & server
 - [X] Live update the rebuilt server bundle without restart the dev server
   - how webpackHotServerMiddleware does it
@@ -20,7 +20,7 @@ Topics I'm researching to build scalable, server-side render web servers.
   - for initial assets: the information is available in clientStats use in server render handler
   - for on-demand assets: nothing to do. the information is automatically handle via webpack runtime on the client-side
 - [ ] How to compile only related subtree of the requesting page/entry
-- [ ] VSCode debugging attach to the bundled server runtime (server/render not server/index)
+- [X] VSCode debugging attach to the bundled server runtime (server/render not server/index)
 
 ### Production Workflow
 
